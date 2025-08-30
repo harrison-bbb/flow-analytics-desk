@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { ExecutionsChart } from "@/components/dashboard/ExecutionsChart";
+import { LoginForm } from "@/components/auth/LoginForm";
 import { 
   TrendingUp, 
   Clock, 
@@ -13,6 +15,19 @@ import {
 } from "lucide-react";
 
 const Index = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = (email: string, password: string) => {
+    // This is a demo login - in production, use Supabase authentication
+    if (email && password) {
+      setIsLoggedIn(true);
+    }
+  };
+
+  if (!isLoggedIn) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 space-y-8">
