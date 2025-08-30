@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { ExecutionsChart } from "@/components/dashboard/ExecutionsChart";
-import { LoginForm } from "@/components/auth/LoginForm";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   TrendingUp, 
   Clock, 
@@ -15,17 +16,25 @@ import {
 } from "lucide-react";
 
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogin = (email: string, password: string) => {
-    // This is a demo login - in production, use Supabase authentication
-    if (email && password) {
-      setIsLoggedIn(true);
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
     }
-  };
+  }, [user, loading, navigate]);
 
-  if (!isLoggedIn) {
-    return <LoginForm onLogin={handleLogin} />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Will redirect to auth page
   }
 
   return (
