@@ -35,36 +35,40 @@ serve(async (req) => {
     // Get current month
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
 
-    // Fetch workflows for the user
-    const { data: workflows, error: workflowError } = await supabase
-      .from('workflows')
-      .select('*')
-      .eq('user_id', user.id);
+    // Get unique workflow names from executions for this user
+    const { data: uniqueWorkflows, error: workflowError } = await supabase
+      .from('executions_log')
+      .select('workflow_name')
+      .eq('user_id', user.id)
+      .gte('execution_date', `${currentMonth}-01`)
+      .lt('execution_date', `${getNextMonth(currentMonth)}-01`);
 
     if (workflowError) {
-      console.error('Error fetching workflows:', workflowError);
+      console.error('Error fetching workflow names:', workflowError);
       throw workflowError;
     }
 
-    console.log(`Found ${workflows?.length || 0} workflows`);
+    // Get unique workflow names
+    const workflowNames = [...new Set(uniqueWorkflows?.map(w => w.workflow_name) || [])];
+    console.log(`Found ${workflowNames.length} unique workflows from executions`);
 
-    // For each workflow, calculate performance metrics
+    // For each unique workflow, calculate performance metrics
     const workflowPerformance = await Promise.all(
-      (workflows || []).map(async (workflow) => {
+      workflowNames.map(async (workflowName) => {
         // Get executions for this workflow this month
         const { data: executions, error: execError } = await supabase
           .from('executions_log')
           .select('*')
           .eq('user_id', user.id)
-          .eq('workflow_name', workflow.workflow_name)
+          .eq('workflow_name', workflowName)
           .gte('execution_date', `${currentMonth}-01`)
           .lt('execution_date', `${getNextMonth(currentMonth)}-01`);
 
         if (execError) {
           console.error('Error fetching executions:', execError);
           return {
-            id: workflow.id,
-            workflow_name: workflow.workflow_name,
+            id: `workflow-${workflowName.toLowerCase().replace(/\s+/g, '-')}`,
+            workflow_name: workflowName,
             total_executions: 0,
             success_rate: 0,
             time_saved: 0,
@@ -79,8 +83,8 @@ serve(async (req) => {
         const moneySaved = executions?.reduce((sum, e) => sum + (Number(e.money_saved) || 0), 0) || 0;
 
         return {
-          id: workflow.id,
-          workflow_name: workflow.workflow_name,
+          id: `workflow-${workflowName.toLowerCase().replace(/\s+/g, '-')}`,
+          workflow_name: workflowName,
           total_executions: totalExecutions,
           success_rate: Math.round(successRate * 10) / 10, // Round to 1 decimal
           time_saved: timeSaved,
