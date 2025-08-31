@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 export interface ExecutionChartData {
-  day: string;
+  month: string;
   executions: number;
 }
 

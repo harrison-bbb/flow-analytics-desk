@@ -39,8 +39,8 @@ export const ExecutionStatusChart = () => {
     );
   }
 
-  // Calculate total executions from daily data
-  const totalExecutions = executions?.reduce((sum, day) => sum + day.executions, 0) || 0;
+  // Calculate total executions from monthly data
+  const totalExecutions = (executions as any)?.reduce((sum: number, month: any) => sum + month.executions, 0) || 0;
   
   // For demo purposes, assume 90% success rate
   // In a real scenario, you'd get this from execution status data
@@ -88,7 +88,7 @@ export const ExecutionStatusChart = () => {
         {totalExecutions === 0 ? (
           <div className="h-[300px] flex items-center justify-center">
             <p className="text-muted-foreground text-center">
-              No execution data available for this month.
+              No execution data available for the last 6 months.
             </p>
           </div>
         ) : (

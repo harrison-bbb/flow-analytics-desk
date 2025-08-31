@@ -2,20 +2,73 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { useChartData, ExecutionChartData } from "@/hooks/useChartData";
 export const ExecutionsChart = () => {
-  const {
-    data,
-    loading
-  } = useChartData('executions');
+  const { data, loading } = useChartData('executions');
+
   if (loading) {
-    return <Card className="col-span-full lg:col-span-1">
+    return (
+      <Card className="col-span-full lg:col-span-1">
         <CardHeader>
-          <CardTitle>Daily Executions</CardTitle>
-          <CardDescription>Workflow executions this week</CardDescription>
+          <CardTitle>Monthly Executions</CardTitle>
+          <CardDescription>Workflow executions over the last 6 months</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="h-[350px] flex items-center justify-center">Loading...</div>
         </CardContent>
-      </Card>;
+      </Card>
+    );
   }
-  return;
+
+  return (
+    <Card className="col-span-full lg:col-span-1">
+      <CardHeader>
+        <CardTitle>Monthly Executions</CardTitle>
+        <CardDescription>Workflow executions over the last 6 months</CardDescription>
+      </CardHeader>
+      <CardContent className="pl-2">
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={data as ExecutionChartData[]}>
+            <XAxis 
+              dataKey="month" 
+              stroke="hsl(var(--muted-foreground))"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="hsl(var(--muted-foreground))"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <Tooltip 
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-col">
+                          <span className="text-[0.70rem] uppercase text-muted-foreground">
+                            {label}
+                          </span>
+                          <span className="font-bold text-primary">
+                            {payload[0].value} executions
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Bar
+              dataKey="executions"
+              fill="hsl(var(--primary))"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
 };

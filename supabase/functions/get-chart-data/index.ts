@@ -33,10 +33,11 @@ serve(async (req) => {
     const { type = 'executions' } = await req.json().catch(() => ({}));
 
     if (type === 'executions') {
-      // Get daily executions for the last 7 days
+      // Get monthly executions for the last 6 months
       const endDate = new Date();
       const startDate = new Date();
-      startDate.setDate(endDate.getDate() - 6);
+      startDate.setMonth(endDate.getMonth() - 5);
+      startDate.setDate(1); // First day of 6 months ago
 
       console.log(`Fetching executions from ${startDate.toISOString()} to ${endDate.toISOString()}`);
 
@@ -45,7 +46,8 @@ serve(async (req) => {
         .select('execution_date')
         .eq('user_id', user.id)
         .gte('execution_date', startDate.toISOString())
-        .lte('execution_date', endDate.toISOString());
+        .lte('execution_date', endDate.toISOString())
+        .order('execution_date', { ascending: true });
 
       if (execError) {
         console.error('Error fetching executions:', execError);
@@ -53,35 +55,47 @@ serve(async (req) => {
       }
 
       console.log(`Found ${executions?.length || 0} executions`);
-      console.log('Executions data:', executions);
 
-      // Group by day
-      const dailyData = [];
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(startDate);
-        date.setDate(date.getDate() + i);
-        const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
-        
-        // Use date only comparison (YYYY-MM-DD format)
-        const targetDateStr = date.toISOString().split('T')[0];
-        
-        // Count executions for this specific date
-        const count = executions?.filter(exec => {
-          const execDateStr = new Date(exec.execution_date).toISOString().split('T')[0];
-          console.log(`Comparing ${execDateStr} with ${targetDateStr}`);
-          return execDateStr === targetDateStr;
-        }).length || 0;
-
-        console.log(`${dayStr} (${targetDateStr}): ${count} executions`);
-
-        dailyData.push({
-          day: dayStr,
-          executions: count
-        });
+      // Group by month and calculate totals
+      const monthlyData: { [key: string]: number } = {};
+      
+      // Initialize all 6 months with zero data
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthlyData[monthKey] = 0;
       }
+      
+      executions?.forEach(log => {
+        const date = new Date(log.execution_date);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (monthlyData[monthKey] !== undefined) {
+          monthlyData[monthKey] += 1;
+        }
+      });
+
+      // Convert to array format expected by the chart
+      const chartData = Object.entries(monthlyData)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([monthKey, count]) => {
+          const [year, monthNum] = monthKey.split('-');
+          const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('en-US', { 
+            month: 'short',
+            year: 'numeric'
+          });
+          
+          console.log(`${monthName}: ${count} executions`);
+          
+          return {
+            month: monthName,
+            executions: count
+          };
+        });
 
       return new Response(
-        JSON.stringify({ data: dailyData }),
+        JSON.stringify({ data: chartData }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } else if (type === 'savings') {
