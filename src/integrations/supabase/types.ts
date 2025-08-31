@@ -14,11 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_profile: {
+        Row: {
+          address: string | null
+          business_name: string | null
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          logo_url: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          business_name?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          business_name?: string | null
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          logo_url?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       executions_log: {
         Row: {
           automation_type: string | null
           created_at: string | null
           execution_date: string | null
+          execution_details: string | null
           execution_status: string | null
           id: string
           metadata: Json | null
@@ -32,6 +75,7 @@ export type Database = {
           automation_type?: string | null
           created_at?: string | null
           execution_date?: string | null
+          execution_details?: string | null
           execution_status?: string | null
           id?: string
           metadata?: Json | null
@@ -45,6 +89,7 @@ export type Database = {
           automation_type?: string | null
           created_at?: string | null
           execution_date?: string | null
+          execution_details?: string | null
           execution_status?: string | null
           id?: string
           metadata?: Json | null
