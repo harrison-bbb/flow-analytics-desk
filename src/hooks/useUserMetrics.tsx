@@ -87,6 +87,18 @@ export const useUserMetrics = () => {
 
   useEffect(() => {
     fetchMetrics();
+    
+    // Listen for custom events to refresh metrics
+    const handleMetricsUpdate = () => {
+      console.log('Refreshing metrics due to subscription change');
+      fetchMetrics();
+    };
+    
+    window.addEventListener('userMetricsUpdated', handleMetricsUpdate);
+    
+    return () => {
+      window.removeEventListener('userMetricsUpdated', handleMetricsUpdate);
+    };
   }, [user?.id]);
 
   // Set up real-time subscription

@@ -104,9 +104,17 @@ export const useSubscriptionPlans = () => {
       setUserSubscription(data);
       
       // Recalculate user metrics with new plan
-      await supabase.functions.invoke('recalculate-user-metrics', {
+      const { error: recalcError } = await supabase.functions.invoke('recalculate-user-metrics', {
         body: { user_id: user.id }
       });
+
+      if (recalcError) {
+        console.error('Error recalculating metrics:', recalcError);
+      }
+
+      // Trigger refresh of user metrics in the parent component
+      // This will be handled by real-time subscription or manual refetch
+      window.dispatchEvent(new CustomEvent('userMetricsUpdated'));
 
       return data;
     } catch (err) {
