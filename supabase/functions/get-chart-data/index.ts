@@ -53,9 +53,11 @@ serve(async (req) => {
         const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
         const dateStr = date.toISOString().split('T')[0];
         
-        const count = executions?.filter(exec => 
-          exec.execution_date.split('T')[0] === dateStr
-        ).length || 0;
+        const count = executions?.filter(exec => {
+          const execDate = new Date(exec.execution_date);
+          const execDateStr = execDate.toISOString().split('T')[0];
+          return execDateStr === dateStr;
+        }).length || 0;
 
         dailyData.push({
           day: dayStr,
@@ -68,41 +70,50 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     } else if (type === 'savings') {
-      // Get monthly savings for the last 6 months
-      const monthlyData = [];
-      for (let i = 5; i >= 0; i--) {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        const monthStr = date.toLocaleDateString('en-US', { month: 'short' });
-        const yearMonth = date.toISOString().slice(0, 7);
+      // Get monthly savings data for the last 6 months
+      const { data: savingsData, error: savingsError } = await supabaseClient
+        .from('executions_log')
+        .select('execution_date, money_saved')
+        .eq('user_id', user.id)
+        .gte('execution_date', new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000).toISOString())
+        .order('execution_date', { ascending: true });
 
-        // Calculate the last day of the month properly
-        const nextMonth = new Date(date);
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
-        const lastDay = new Date(nextMonth.getTime() - 1).toISOString().slice(0, 10);
-        
-        const { data: monthlyExecutions } = await supabaseClient
-          .from('executions_log')
-          .select('money_saved')
-          .eq('user_id', user.id)
-          .gte('execution_date', `${yearMonth}-01`)
-          .lte('execution_date', `${lastDay}T23:59:59.999Z`);
-
-        const savings = monthlyExecutions?.reduce((sum, exec) => 
-          sum + (Number(exec.money_saved) || 0), 0
-        ) || 0;
-
-        const executions = monthlyExecutions?.length || 0;
-
-        monthlyData.push({
-          month: monthStr,
-          savings: Math.round(savings),
-          executions
-        });
+      if (savingsError) {
+        throw savingsError;
       }
 
+      // Group by month and calculate totals
+      const monthlyData: { [key: string]: { savings: number; executions: number } } = {};
+      
+      savingsData?.forEach(log => {
+        const date = new Date(log.execution_date);
+        const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (!monthlyData[month]) {
+          monthlyData[month] = { savings: 0, executions: 0 };
+        }
+        
+        monthlyData[month].savings += parseFloat(log.money_saved || 0);
+        monthlyData[month].executions += 1;
+      });
+
+      // Convert to array format expected by the chart with proper month names
+      const chartData = Object.entries(monthlyData).map(([month, data]) => {
+        const [year, monthNum] = month.split('-');
+        const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short' 
+        });
+        
+        return {
+          month: monthName,
+          savings: Math.round(data.savings),
+          executions: data.executions
+        };
+      });
+
       return new Response(
-        JSON.stringify({ data: monthlyData }),
+        JSON.stringify({ data: chartData }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
