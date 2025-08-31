@@ -14,7 +14,129 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      executions_log: {
+        Row: {
+          automation_type: string | null
+          created_at: string | null
+          execution_date: string | null
+          execution_status: string | null
+          id: string
+          metadata: Json | null
+          money_saved: number | null
+          n8n_workflow_id: string | null
+          time_saved: number | null
+          user_id: string | null
+          workflow_name: string
+        }
+        Insert: {
+          automation_type?: string | null
+          created_at?: string | null
+          execution_date?: string | null
+          execution_status?: string | null
+          id?: string
+          metadata?: Json | null
+          money_saved?: number | null
+          n8n_workflow_id?: string | null
+          time_saved?: number | null
+          user_id?: string | null
+          workflow_name: string
+        }
+        Update: {
+          automation_type?: string | null
+          created_at?: string | null
+          execution_date?: string | null
+          execution_status?: string | null
+          id?: string
+          metadata?: Json | null
+          money_saved?: number | null
+          n8n_workflow_id?: string | null
+          time_saved?: number | null
+          user_id?: string | null
+          workflow_name?: string
+        }
+        Relationships: []
+      }
+      user_metrics: {
+        Row: {
+          api_usage_percentage: number | null
+          created_at: string | null
+          executions_month: number | null
+          id: string
+          last_updated: string | null
+          managed_workflows: number | null
+          money_saved_month: number | null
+          money_saved_total: number | null
+          roi_percentage: number | null
+          time_saved_month: number | null
+          user_id: string | null
+        }
+        Insert: {
+          api_usage_percentage?: number | null
+          created_at?: string | null
+          executions_month?: number | null
+          id?: string
+          last_updated?: string | null
+          managed_workflows?: number | null
+          money_saved_month?: number | null
+          money_saved_total?: number | null
+          roi_percentage?: number | null
+          time_saved_month?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          api_usage_percentage?: number | null
+          created_at?: string | null
+          executions_month?: number | null
+          id?: string
+          last_updated?: string | null
+          managed_workflows?: number | null
+          money_saved_month?: number | null
+          money_saved_total?: number | null
+          roi_percentage?: number | null
+          time_saved_month?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      workflows: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          estimated_money_saved_per_run: number | null
+          estimated_time_saved_per_run: number | null
+          id: string
+          n8n_workflow_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          workflow_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          estimated_money_saved_per_run?: number | null
+          estimated_time_saved_per_run?: number | null
+          id?: string
+          n8n_workflow_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          workflow_name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          estimated_money_saved_per_run?: number | null
+          estimated_time_saved_per_run?: number | null
+          id?: string
+          n8n_workflow_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          workflow_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

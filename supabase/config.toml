@@ -1,1 +1,7 @@
 project_id = "usudyoxblzruwzowcets"
+
+[functions.record-execution]
+verify_jwt = false
+
+[functions.get-chart-data]
+verify_jwt = false

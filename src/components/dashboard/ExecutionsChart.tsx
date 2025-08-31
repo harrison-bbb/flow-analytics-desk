@@ -1,17 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-
-const data = [
-  { day: "Mon", executions: 45 },
-  { day: "Tue", executions: 52 },
-  { day: "Wed", executions: 38 },
-  { day: "Thu", executions: 67 },
-  { day: "Fri", executions: 48 },
-  { day: "Sat", executions: 23 },
-  { day: "Sun", executions: 31 },
-];
+import { useChartData, ExecutionChartData } from "@/hooks/useChartData";
 
 export const ExecutionsChart = () => {
+  const { data, loading } = useChartData('executions');
+
+  if (loading) {
+    return (
+      <Card className="col-span-full lg:col-span-1">
+        <CardHeader>
+          <CardTitle>Daily Executions</CardTitle>
+          <CardDescription>Workflow executions this week</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px] flex items-center justify-center">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <Card className="col-span-full lg:col-span-1">
       <CardHeader>
@@ -22,7 +28,7 @@ export const ExecutionsChart = () => {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={350}>
-          <BarChart data={data}>
+          <BarChart data={data as ExecutionChartData[]}>
             <XAxis 
               dataKey="day" 
               stroke="hsl(var(--muted-foreground))"

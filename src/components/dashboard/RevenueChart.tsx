@@ -1,16 +1,23 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-
-const data = [
-  { month: "Jan", savings: 4800, executions: 120 },
-  { month: "Feb", savings: 7200, executions: 180 },
-  { month: "Mar", savings: 9600, executions: 240 },
-  { month: "Apr", savings: 12000, executions: 300 },
-  { month: "May", savings: 15600, executions: 390 },
-  { month: "Jun", savings: 18000, executions: 450 },
-];
+import { useChartData, SavingsChartData } from "@/hooks/useChartData";
 
 export const RevenueChart = () => {
+  const { data, loading } = useChartData('savings');
+
+  if (loading) {
+    return (
+      <Card className="col-span-full lg:col-span-2">
+        <CardHeader>
+          <CardTitle>Money Saved Over Time</CardTitle>
+          <CardDescription>Monthly savings from automated workflows</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[350px] flex items-center justify-center">Loading...</div>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <Card className="col-span-full lg:col-span-2">
       <CardHeader>
@@ -21,7 +28,7 @@ export const RevenueChart = () => {
       </CardHeader>
       <CardContent className="pl-2">
         <ResponsiveContainer width="100%" height={350}>
-          <AreaChart data={data}>
+          <AreaChart data={data as SavingsChartData[]}>
             <XAxis 
               dataKey="month" 
               stroke="hsl(var(--muted-foreground))"

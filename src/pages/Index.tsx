@@ -5,6 +5,7 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { ExecutionsChart } from "@/components/dashboard/ExecutionsChart";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserMetrics } from "@/hooks/useUserMetrics";
 import { 
   TrendingUp, 
   Clock, 
@@ -17,6 +18,7 @@ import {
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const { metrics, loading: metricsLoading } = useUserMetrics();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +27,7 @@ const Index = () => {
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  if (loading || metricsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-foreground">Loading...</div>
@@ -46,28 +48,25 @@ const Index = () => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="ROI"
-            value="284%"
+            value={`${Math.round(metrics?.roi_percentage || 0)}%`}
             icon={TrendingUp}
-            trend={{ value: 12.5, label: "from last month" }}
-            variant="success"
+            variant={metrics?.roi_percentage && metrics.roi_percentage > 0 ? "success" : "default"}
           />
           <MetricCard
             title="Time Saved This Month"
-            value="156h"
+            value={`${metrics?.time_saved_month || 0}h`}
             icon={Clock}
-            trend={{ value: 8.2, label: "from last month" }}
             variant="success"
           />
           <MetricCard
             title="Money Saved This Month"
-            value="$18,000"
+            value={`$${(metrics?.money_saved_month || 0).toLocaleString()}`}
             icon={DollarSign}
-            trend={{ value: 15.3, label: "from last month" }}
             variant="success"
           />
           <MetricCard
             title="Money Saved All Time"
-            value="$127,400"
+            value={`$${(metrics?.money_saved_total || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
           />
@@ -77,22 +76,19 @@ const Index = () => {
         <div className="grid gap-4 md:grid-cols-3">
           <MetricCard
             title="Total Executions This Month"
-            value="1,847"
+            value={metrics?.executions_month || 0}
             icon={Zap}
-            trend={{ value: 22.1, label: "from last month" }}
           />
           <MetricCard
             title="Current Managed Workflows"
-            value="23"
+            value={metrics?.managed_workflows || 0}
             icon={GitBranch}
-            trend={{ value: 4.3, label: "new this month" }}
           />
           <MetricCard
             title="API Usage"
-            value="89%"
+            value={`${Math.round(metrics?.api_usage_percentage || 0)}%`}
             icon={Database}
-            trend={{ value: -2.1, label: "from last month" }}
-            variant="warning"
+            variant={metrics?.api_usage_percentage && metrics.api_usage_percentage > 80 ? "warning" : "default"}
           />
         </div>
 
