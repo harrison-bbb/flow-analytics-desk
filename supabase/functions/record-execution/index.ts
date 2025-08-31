@@ -125,5 +125,7 @@ serve(async (req) => {
 function calculateROI(totalSaved: number, executions: number): number {
   // Simple ROI calculation - this can be customized based on business logic
   const estimatedCost = executions * 10; // Assume $10 cost per execution
-  return totalSaved > 0 ? ((totalSaved - estimatedCost) / estimatedCost) * 100 : 0;
+  const roi = totalSaved > 0 ? ((totalSaved - estimatedCost) / estimatedCost) * 100 : 0;
+  // Cap ROI at 999 to prevent numeric overflow
+  return Math.min(999, Math.max(-999, roi));
 }

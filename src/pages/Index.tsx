@@ -12,8 +12,7 @@ import {
   DollarSign, 
   Zap, 
   GitBranch, 
-  Activity,
-  Database
+  Activity
 } from "lucide-react";
 
 const Index = () => {
@@ -73,7 +72,7 @@ const Index = () => {
         </div>
 
         {/* Secondary Metrics */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2">
           <MetricCard
             title="Total Executions This Month"
             value={metrics?.executions_month || 0}
@@ -83,12 +82,6 @@ const Index = () => {
             title="Current Managed Workflows"
             value={metrics?.managed_workflows || 0}
             icon={GitBranch}
-          />
-          <MetricCard
-            title="API Usage"
-            value={`${Math.round(metrics?.api_usage_percentage || 0)}%`}
-            icon={Database}
-            variant={metrics?.api_usage_percentage && metrics.api_usage_percentage > 80 ? "warning" : "default"}
           />
         </div>
 

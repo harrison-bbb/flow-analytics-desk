@@ -66,7 +66,8 @@ serve(async (req) => {
         const dateStr = date.toISOString().split('T')[0];
         
         const count = executions?.filter(exec => {
-          const execDateStr = exec.execution_date.split('T')[0];
+          const execDate = new Date(exec.execution_date);
+          const execDateStr = execDate.toISOString().split('T')[0];
           return execDateStr === dateStr;
         }).length || 0;
 
@@ -122,7 +123,7 @@ serve(async (req) => {
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
         if (monthlyData[monthKey]) {
-          monthlyData[monthKey].savings += parseFloat(log.money_saved || 0);
+          monthlyData[monthKey].savings += parseFloat(log.money_saved || '0');
           monthlyData[monthKey].executions += 1;
         }
       });
