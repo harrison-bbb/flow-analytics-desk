@@ -187,6 +187,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_roi_safe: {
+        Args: { executions: number; total_saved: number }
+        Returns: number
+      }
       recalculate_user_metrics_simple: {
         Args: { target_user_id: string }
         Returns: undefined
