@@ -138,15 +138,14 @@ export const useUserMetrics = () => {
         (payload) => {
           console.log('Real-time metrics update:', payload);
           if (payload.eventType === 'UPDATE' && payload.new) {
-            setMetrics({
+            // Only update certain fields from real-time, keep live-calculated fields
+            setMetrics(prev => prev ? {
+              ...prev,
               roi_percentage: Number(payload.new.roi_percentage) || 0,
-              time_saved_month: payload.new.time_saved_month || 0,
-              money_saved_month: Number(payload.new.money_saved_month) || 0,
               money_saved_total: Number(payload.new.money_saved_total) || 0,
-              executions_month: payload.new.executions_month || 0,
               managed_workflows: payload.new.managed_workflows || 0,
-              api_usage_percentage: 0, // This field doesn't exist in new schema
-            });
+              // Don't update monthly fields - they come from live trends calculation
+            } : null);
           }
         }
       )
