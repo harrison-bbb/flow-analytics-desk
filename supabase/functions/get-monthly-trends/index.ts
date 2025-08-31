@@ -40,26 +40,32 @@ serve(async (req) => {
 
     console.log(`Fetching metrics for current month: ${currentMonth}, previous month: ${previousMonth}`);
 
-    // Get current month metrics from executions_log
+    // Get current month metrics from executions_log (using same logic as chart)
+    const currentMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const nextMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+    
     const { data: currentMonthData, error: currentError } = await supabaseClient
       .from('executions_log')
       .select('money_saved, time_saved')
       .eq('user_id', user.id)
-      .gte('execution_date', `${currentMonth}-01`)
-      .lt('execution_date', `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 2).padStart(2, '0')}-01`);
+      .gte('execution_date', currentMonthStart.toISOString())
+      .lt('execution_date', nextMonthStart.toISOString());
 
     if (currentError) {
       console.error('Error fetching current month data:', currentError);
       throw currentError;
     }
 
-    // Get previous month metrics from executions_log
+    // Get previous month metrics from executions_log (using same logic as chart)
+    const previousMonthStart = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1);
+    const currentMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    
     const { data: previousMonthData, error: previousError } = await supabaseClient
       .from('executions_log')
       .select('money_saved, time_saved')
       .eq('user_id', user.id)
-      .gte('execution_date', `${previousMonth}-01`)
-      .lt('execution_date', `${currentMonth}-01`);
+      .gte('execution_date', previousMonthStart.toISOString())
+      .lt('execution_date', currentMonthStart.toISOString());
 
     if (previousError) {
       console.error('Error fetching previous month data:', previousError);
@@ -129,7 +135,12 @@ serve(async (req) => {
     });
 
     return new Response(
-      JSON.stringify({ trends }),
+      JSON.stringify({ 
+        trends,
+        currentMonthMoney,
+        currentMonthTime,
+        currentMonthExecutions
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

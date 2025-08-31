@@ -68,13 +68,27 @@ export const useUserMetrics = () => {
         });
       }
 
-      // Fetch monthly trends
+      // Fetch monthly trends and update metrics with correct monthly totals
       const { data: trendsData, error: trendsError } = await supabase.functions.invoke('get-monthly-trends');
       
       if (trendsError) {
         console.error('Error fetching trends:', trendsError);
       } else if (trendsData?.trends) {
         setTrends(trendsData.trends);
+        
+        // Update metrics with the correct monthly money saved from trends calculation
+        if (data && trendsData.trends) {
+          const currentMonthMoney = trendsData.currentMonthMoney || 0;
+          const currentMonthTime = trendsData.currentMonthTime || 0;
+          const currentMonthExecutions = trendsData.currentMonthExecutions || 0;
+          
+          setMetrics(prev => prev ? {
+            ...prev,
+            money_saved_month: currentMonthMoney,
+            time_saved_month: currentMonthTime,
+            executions_month: currentMonthExecutions,
+          } : null);
+        }
       }
 
     } catch (err) {
