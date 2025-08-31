@@ -76,12 +76,17 @@ serve(async (req) => {
         const monthStr = date.toLocaleDateString('en-US', { month: 'short' });
         const yearMonth = date.toISOString().slice(0, 7);
 
+        // Calculate the last day of the month properly
+        const nextMonth = new Date(date);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        const lastDay = new Date(nextMonth.getTime() - 1).toISOString().slice(0, 10);
+        
         const { data: monthlyExecutions } = await supabaseClient
           .from('executions_log')
           .select('money_saved')
           .eq('user_id', user.id)
           .gte('execution_date', `${yearMonth}-01`)
-          .lt('execution_date', `${yearMonth}-32`);
+          .lte('execution_date', `${lastDay}T23:59:59.999Z`);
 
         const savings = monthlyExecutions?.reduce((sum, exec) => 
           sum + (Number(exec.money_saved) || 0), 0
