@@ -12,9 +12,18 @@ export interface UserMetrics {
   api_usage_percentage: number;
 }
 
+export interface MonthlyTrends {
+  money_saved_month_change: number;
+  money_saved_total_change: number;
+  time_saved_month_change: number;
+  roi_change: number;
+  executions_change: number;
+}
+
 export const useUserMetrics = () => {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<UserMetrics | null>(null);
+  const [trends, setTrends] = useState<MonthlyTrends | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +34,7 @@ export const useUserMetrics = () => {
       setLoading(true);
       setError(null);
 
+      // Fetch current metrics
       const { data, error: fetchError } = await supabase
         .from('user_metrics')
         .select('*')
@@ -57,6 +67,16 @@ export const useUserMetrics = () => {
           api_usage_percentage: 0,
         });
       }
+
+      // Fetch monthly trends
+      const { data: trendsData, error: trendsError } = await supabase.functions.invoke('get-monthly-trends');
+      
+      if (trendsError) {
+        console.error('Error fetching trends:', trendsError);
+      } else if (trendsData?.trends) {
+        setTrends(trendsData.trends);
+      }
+
     } catch (err) {
       console.error('Error fetching user metrics:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch metrics');
@@ -105,5 +125,5 @@ export const useUserMetrics = () => {
     };
   }, [user?.id]);
 
-  return { metrics, loading, error, refetch: fetchMetrics };
+  return { metrics, trends, loading, error, refetch: fetchMetrics };
 };

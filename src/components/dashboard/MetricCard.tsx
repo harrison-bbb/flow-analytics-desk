@@ -9,6 +9,7 @@ interface MetricCardProps {
   trend?: {
     value: number;
     label: string;
+    isAbsolute?: boolean;
   };
   variant?: "default" | "success" | "warning";
   className?: string;
@@ -48,9 +49,15 @@ export const MetricCard = ({
           <p className="text-xs text-muted-foreground mt-1">
             <span className={cn(
               "font-medium",
-              trend.value > 0 ? "text-success" : "text-destructive"
+              trend.value > 0 ? "text-success" : trend.value < 0 ? "text-destructive" : "text-muted-foreground"
             )}>
-              {trend.value > 0 ? "+" : ""}{trend.value}%
+              {trend.value > 0 ? "+" : ""}{trend.isAbsolute ? 
+                (trend.value >= 1000 ? 
+                  `$${(trend.value / 1000).toFixed(1)}k` : 
+                  `$${Math.round(trend.value).toLocaleString()}`
+                ) : 
+                `${trend.value}%`
+              }
             </span>{" "}
             {trend.label}
           </p>

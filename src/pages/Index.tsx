@@ -21,7 +21,7 @@ import {
 
 const Index = () => {
   const { user, loading } = useAuth();
-  const { metrics, loading: metricsLoading } = useUserMetrics();
+  const { metrics, trends, loading: metricsLoading } = useUserMetrics();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,24 +54,43 @@ const Index = () => {
             value={`${Math.round(metrics?.roi_percentage || 0)}%`}
             icon={TrendingUp}
             variant={metrics?.roi_percentage && metrics.roi_percentage > 0 ? "success" : "default"}
+            trend={trends?.roi_change ? {
+              value: trends.roi_change,
+              label: "since last month"
+            } : undefined}
           />
           <MetricCard
             title="Time Saved This Month"
             value={`${metrics?.time_saved_month || 0}h`}
             icon={Clock}
             variant="success"
+            trend={trends?.time_saved_month_change ? {
+              value: trends.time_saved_month_change,
+              label: "since last month",
+              isAbsolute: true
+            } : undefined}
           />
           <MetricCard
             title="Money Saved This Month"
             value={`$${(metrics?.money_saved_month || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
+            trend={trends?.money_saved_month_change ? {
+              value: trends.money_saved_month_change,
+              label: "since last month",
+              isAbsolute: true
+            } : undefined}
           />
           <MetricCard
             title="Money Saved All Time"
             value={`$${(metrics?.money_saved_total || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
+            trend={trends?.money_saved_total_change ? {
+              value: trends.money_saved_total_change,
+              label: "since last month",
+              isAbsolute: true
+            } : undefined}
           />
         </div>
 
@@ -81,6 +100,11 @@ const Index = () => {
             title="Total Executions This Month"
             value={metrics?.executions_month || 0}
             icon={Zap}
+            trend={trends?.executions_change ? {
+              value: trends.executions_change,
+              label: "since last month",
+              isAbsolute: true
+            } : undefined}
           />
           <MetricCard
             title="Current Managed Workflows"
