@@ -9,6 +9,9 @@ interface WorkflowPerformance {
   success_rate: number;
   time_saved: number;
   money_saved: number;
+  is_currently_managed: boolean;
+  parent_workflow_id: string | null;
+  db_id: string | null;
 }
 
 export const useWorkflowPerformance = () => {
@@ -56,5 +59,80 @@ export const useWorkflowPerformance = () => {
     }
   }, [user, session]);
 
-  return { data, loading, error, refetch: fetchData };
+  const updateWorkflowManaged = async (workflowId: string, isManaged: boolean) => {
+    if (!session?.access_token) return;
+
+    try {
+      const workflow = data.find(w => w.id === workflowId);
+      if (!workflow?.db_id) {
+        // Create workflow record if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('workflows')
+          .insert({
+            user_id: user?.id,
+            n8n_workflow_id: workflowId,
+            workflow_name: workflow?.workflow_name || 'Unknown Workflow',
+            is_currently_managed: isManaged
+          });
+
+        if (insertError) throw insertError;
+      } else {
+        // Update existing workflow
+        const { error: updateError } = await supabase
+          .from('workflows')
+          .update({ is_currently_managed: isManaged })
+          .eq('id', workflow.db_id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Refresh data to get updated managed status
+      await fetchData();
+    } catch (err) {
+      console.error('Error updating workflow managed status:', err);
+    }
+  };
+
+  const updateWorkflowParent = async (workflowId: string, parentId: string | null) => {
+    if (!session?.access_token) return;
+
+    try {
+      const workflow = data.find(w => w.id === workflowId);
+      if (!workflow?.db_id) {
+        // Create workflow record if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('workflows')
+          .insert({
+            user_id: user?.id,
+            n8n_workflow_id: workflowId,
+            workflow_name: workflow?.workflow_name || 'Unknown Workflow',
+            parent_workflow_id: parentId
+          });
+
+        if (insertError) throw insertError;
+      } else {
+        // Update existing workflow
+        const { error: updateError } = await supabase
+          .from('workflows')
+          .update({ parent_workflow_id: parentId })
+          .eq('id', workflow.db_id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Refresh data to get updated parent relationship
+      await fetchData();
+    } catch (err) {
+      console.error('Error updating workflow parent:', err);
+    }
+  };
+
+  return { 
+    data, 
+    loading, 
+    error, 
+    refetch: fetchData, 
+    updateWorkflowManaged, 
+    updateWorkflowParent 
+  };
 };

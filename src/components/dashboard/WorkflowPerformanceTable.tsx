@@ -9,11 +9,19 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useWorkflowPerformance } from "@/hooks/useWorkflowPerformance";
 import { TrendingUp, Clock, DollarSign, Target } from "lucide-react";
 
 export const WorkflowPerformanceTable = () => {
-  const { data, loading, error } = useWorkflowPerformance();
+  const { data, loading, error, updateWorkflowManaged, updateWorkflowParent } = useWorkflowPerformance();
 
   if (loading) {
     return (
@@ -94,11 +102,15 @@ export const WorkflowPerformanceTable = () => {
                     Money Saved
                   </div>
                 </TableHead>
+                <TableHead className="text-center">Sub Workflows</TableHead>
+                <TableHead className="text-center">Currently Managed</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.map((workflow) => {
                 const successRate = formatSuccessRate(workflow.success_rate);
+                const availableParents = data.filter(w => w.id !== workflow.id && !w.parent_workflow_id);
+                
                 return (
                   <TableRow key={workflow.id}>
                     <TableCell className="font-medium">
@@ -125,6 +137,34 @@ export const WorkflowPerformanceTable = () => {
                     </TableCell>
                     <TableCell className="text-center">
                       ${workflow.money_saved}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Select
+                        value={workflow.parent_workflow_id || "none"}
+                        onValueChange={(value) => 
+                          updateWorkflowParent(workflow.id, value === "none" ? null : value)
+                        }
+                      >
+                        <SelectTrigger className="w-32">
+                          <SelectValue placeholder="None" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border border-border">
+                          <SelectItem value="none">None</SelectItem>
+                          {availableParents.map((parent) => (
+                            <SelectItem key={parent.id} value={parent.id}>
+                              {parent.workflow_name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Checkbox
+                        checked={workflow.is_currently_managed}
+                        onCheckedChange={(checked) => 
+                          updateWorkflowManaged(workflow.id, checked as boolean)
+                        }
+                      />
                     </TableCell>
                   </TableRow>
                 );

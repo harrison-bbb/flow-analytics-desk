@@ -221,7 +221,9 @@ export type Database = {
           estimated_money_saved_per_run: number | null
           estimated_time_saved_per_run: number | null
           id: string
+          is_currently_managed: boolean | null
           n8n_workflow_id: string | null
+          parent_workflow_id: string | null
           status: string | null
           updated_at: string | null
           user_id: string | null
@@ -233,7 +235,9 @@ export type Database = {
           estimated_money_saved_per_run?: number | null
           estimated_time_saved_per_run?: number | null
           id?: string
+          is_currently_managed?: boolean | null
           n8n_workflow_id?: string | null
+          parent_workflow_id?: string | null
           status?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -245,13 +249,23 @@ export type Database = {
           estimated_money_saved_per_run?: number | null
           estimated_time_saved_per_run?: number | null
           id?: string
+          is_currently_managed?: boolean | null
           n8n_workflow_id?: string | null
+          parent_workflow_id?: string | null
           status?: string | null
           updated_at?: string | null
           user_id?: string | null
           workflow_name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "workflows_parent_workflow_id_fkey"
+            columns: ["parent_workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

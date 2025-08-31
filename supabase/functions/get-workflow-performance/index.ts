@@ -35,8 +35,19 @@ serve(async (req) => {
     // Get current month
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
 
-    // Get unique workflows from executions for this user (by workflow ID)
-    const { data: uniqueWorkflows, error: workflowError } = await supabase
+    // Get workflows data from the workflows table
+    const { data: workflowsData, error: workflowError } = await supabase
+      .from('workflows')
+      .select('id, n8n_workflow_id, workflow_name, is_currently_managed, parent_workflow_id')
+      .eq('user_id', user.id);
+
+    if (workflowError) {
+      console.error('Error fetching workflows data:', workflowError);
+      throw workflowError;
+    }
+
+    // Also get unique workflows from executions for this user (by workflow ID)
+    const { data: uniqueExecutionWorkflows, error: executionWorkflowError } = await supabase
       .from('executions_log')
       .select('n8n_workflow_id, workflow_name')
       .eq('user_id', user.id)
@@ -44,20 +55,41 @@ serve(async (req) => {
       .lt('execution_date', `${getNextMonth(currentMonth)}-01`)
       .not('n8n_workflow_id', 'is', null);
 
-    if (workflowError) {
-      console.error('Error fetching workflow data:', workflowError);
-      throw workflowError;
+    if (executionWorkflowError) {
+      console.error('Error fetching execution workflow data:', executionWorkflowError);
+      throw executionWorkflowError;
     }
 
-    // Get unique workflows by ID (use the most recent workflow name for each ID)
+    // Merge workflows from both sources, prioritizing workflows table data
     const workflowMap = new Map();
-    uniqueWorkflows?.forEach(w => {
+    
+    // First add workflows from the workflows table
+    workflowsData?.forEach(w => {
       if (w.n8n_workflow_id) {
-        workflowMap.set(w.n8n_workflow_id, w.workflow_name);
+        workflowMap.set(w.n8n_workflow_id, {
+          id: w.n8n_workflow_id,
+          name: w.workflow_name,
+          is_currently_managed: w.is_currently_managed,
+          parent_workflow_id: w.parent_workflow_id,
+          db_id: w.id
+        });
+      }
+    });
+
+    // Then add any workflows from executions that aren't in the workflows table
+    uniqueExecutionWorkflows?.forEach(w => {
+      if (w.n8n_workflow_id && !workflowMap.has(w.n8n_workflow_id)) {
+        workflowMap.set(w.n8n_workflow_id, {
+          id: w.n8n_workflow_id,
+          name: w.workflow_name,
+          is_currently_managed: true, // Default to managed for execution-only workflows
+          parent_workflow_id: null,
+          db_id: null
+        });
       }
     });
     
-    const workflows = Array.from(workflowMap.entries()).map(([id, name]) => ({ id, name }));
+    const workflows = Array.from(workflowMap.values());
     console.log(`Found ${workflows.length} unique workflows from executions`);
 
     // For each unique workflow, calculate performance metrics
@@ -81,6 +113,9 @@ serve(async (req) => {
             success_rate: 0,
             time_saved: 0,
             money_saved: 0,
+            is_currently_managed: workflow.is_currently_managed,
+            parent_workflow_id: workflow.parent_workflow_id,
+            db_id: workflow.db_id
           };
         }
 
@@ -97,6 +132,9 @@ serve(async (req) => {
           success_rate: Math.round(successRate * 10) / 10, // Round to 1 decimal
           time_saved: timeSaved,
           money_saved: Number(moneySaved.toFixed(2)),
+          is_currently_managed: workflow.is_currently_managed,
+          parent_workflow_id: workflow.parent_workflow_id,
+          db_id: workflow.db_id
         };
       })
     );
