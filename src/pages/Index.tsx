@@ -54,8 +54,8 @@ const Index = () => {
             value={`${Math.round(metrics?.roi_percentage || 0)}%`}
             icon={TrendingUp}
             variant={metrics?.roi_percentage && metrics.roi_percentage > 0 ? "success" : "default"}
-            trend={trends?.roi_change ? {
-              value: trends.roi_change,
+            trend={trends?.roi_change !== undefined ? {
+              value: Math.round(trends.roi_change * 100) / 100,
               label: "since last month"
             } : undefined}
           />
@@ -64,7 +64,7 @@ const Index = () => {
             value={`${metrics?.time_saved_month || 0}h`}
             icon={Clock}
             variant="success"
-            trend={trends?.time_saved_month_change ? {
+            trend={trends?.time_saved_month_change !== undefined ? {
               value: trends.time_saved_month_change,
               label: "since last month",
               isAbsolute: true
@@ -75,7 +75,7 @@ const Index = () => {
             value={`$${(metrics?.money_saved_month || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
-            trend={trends?.money_saved_month_change ? {
+            trend={trends?.money_saved_month_change !== undefined ? {
               value: trends.money_saved_month_change,
               label: "since last month",
               isAbsolute: true
@@ -86,9 +86,9 @@ const Index = () => {
             value={`$${(metrics?.money_saved_total || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
-            trend={trends?.money_saved_total_change ? {
+            trend={trends?.money_saved_total_change !== undefined ? {
               value: trends.money_saved_total_change,
-              label: "since last month",
+              label: "this month's contribution",
               isAbsolute: true
             } : undefined}
           />
@@ -100,7 +100,7 @@ const Index = () => {
             title="Total Executions This Month"
             value={metrics?.executions_month || 0}
             icon={Zap}
-            trend={trends?.executions_change ? {
+            trend={trends?.executions_change !== undefined ? {
               value: trends.executions_change,
               label: "since last month",
               isAbsolute: true

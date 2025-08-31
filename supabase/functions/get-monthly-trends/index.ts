@@ -90,35 +90,34 @@ serve(async (req) => {
     const totalMoneySaved = totalData?.reduce((sum, record) => sum + (parseFloat(record.money_saved || '0')), 0) || 0;
     const previousTotalMoney = totalMoneySaved - currentMonthMoney;
 
-    // Calculate ROI for current and previous periods
-    const currentROI = currentMonthExecutions > 0 ? ((totalMoneySaved - (currentMonthExecutions * 10)) / (currentMonthExecutions * 10)) * 100 : 0;
-    const previousROI = previousMonthExecutions > 0 ? ((previousTotalMoney - (previousMonthExecutions * 10)) / (previousMonthExecutions * 10)) * 100 : 0;
-
-    // Calculate changes
-    const moneyChange = currentMonthMoney - previousMonthMoney;
-    const timeChange = currentMonthTime - previousMonthTime;
-    const roiChange = currentROI - previousROI;
-    const totalMoneyChange = totalMoneySaved - previousTotalMoney;
+    // Only calculate meaningful trends if there's previous month data
+    let trends = null;
+    
+    if (previousMonthExecutions > 0) {
+      // Calculate ROI changes based on monthly data, not total
+      const currentMonthROI = currentMonthExecutions > 0 ? 
+        ((currentMonthMoney - (currentMonthExecutions * 10)) / (currentMonthExecutions * 10)) * 100 : 0;
+      const previousMonthROI = previousMonthExecutions > 0 ? 
+        ((previousMonthMoney - (previousMonthExecutions * 10)) / (previousMonthExecutions * 10)) * 100 : 0;
+      
+      trends = {
+        money_saved_month_change: currentMonthMoney - previousMonthMoney,
+        money_saved_total_change: currentMonthMoney, // This month's contribution to total
+        time_saved_month_change: currentMonthTime - previousMonthTime,
+        roi_change: currentMonthROI - previousMonthROI,
+        executions_change: currentMonthExecutions - previousMonthExecutions
+      };
+    }
 
     console.log('Calculated trends:', {
       currentMonthMoney,
       previousMonthMoney,
-      moneyChange,
-      timeChange,
-      roiChange,
-      totalMoneyChange
+      previousMonthExecutions,
+      trends
     });
 
     return new Response(
-      JSON.stringify({
-        trends: {
-          money_saved_month_change: moneyChange,
-          money_saved_total_change: totalMoneyChange,
-          time_saved_month_change: timeChange,
-          roi_change: roiChange,
-          executions_change: currentMonthExecutions - previousMonthExecutions
-        }
-      }),
+      JSON.stringify({ trends }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
