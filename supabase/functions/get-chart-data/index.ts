@@ -35,11 +35,8 @@ serve(async (req) => {
     if (type === 'executions') {
       // Get daily executions for the last 7 days
       const endDate = new Date();
-      endDate.setHours(23, 59, 59, 999); // End of today
-      
       const startDate = new Date();
       startDate.setDate(endDate.getDate() - 6);
-      startDate.setHours(0, 0, 0, 0); // Start of 7 days ago
 
       console.log(`Fetching executions from ${startDate.toISOString()} to ${endDate.toISOString()}`);
 
@@ -56,6 +53,7 @@ serve(async (req) => {
       }
 
       console.log(`Found ${executions?.length || 0} executions`);
+      console.log('Executions data:', executions);
 
       // Group by day
       const dailyData = [];
@@ -63,16 +61,18 @@ serve(async (req) => {
         const date = new Date(startDate);
         date.setDate(date.getDate() + i);
         const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const dateStr = date.toISOString().split('T')[0];
+        
+        // Use date only comparison (YYYY-MM-DD format)
+        const targetDateStr = date.toISOString().split('T')[0];
         
         // Count executions for this specific date
         const count = executions?.filter(exec => {
-          const execDate = new Date(exec.execution_date);
-          const execDateStr = execDate.toISOString().split('T')[0];
-          return execDateStr === dateStr;
+          const execDateStr = new Date(exec.execution_date).toISOString().split('T')[0];
+          console.log(`Comparing ${execDateStr} with ${targetDateStr}`);
+          return execDateStr === targetDateStr;
         }).length || 0;
 
-        console.log(`${dayStr} (${dateStr}): ${count} executions`);
+        console.log(`${dayStr} (${targetDateStr}): ${count} executions`);
 
         dailyData.push({
           day: dayStr,
