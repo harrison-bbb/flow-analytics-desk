@@ -4,6 +4,10 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { ExecutionsChart } from "@/components/dashboard/ExecutionsChart";
+import { WorkflowPerformanceTable } from "@/components/dashboard/WorkflowPerformanceTable";
+import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
+import { ExecutionStatusChart } from "@/components/dashboard/ExecutionStatusChart";
+import { ClientContactCard } from "@/components/dashboard/ClientContactCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserMetrics } from "@/hooks/useUserMetrics";
 import { 
@@ -89,6 +93,16 @@ const Index = () => {
         <div className="grid gap-4 lg:grid-cols-3">
           <RevenueChart />
           <ExecutionsChart />
+          <ExecutionStatusChart />
+        </div>
+
+        {/* Workflow Performance and Activity */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <WorkflowPerformanceTable />
+          <div className="space-y-6">
+            <ActivityFeed />
+            <ClientContactCard />
+          </div>
         </div>
       </div>
     </div>
