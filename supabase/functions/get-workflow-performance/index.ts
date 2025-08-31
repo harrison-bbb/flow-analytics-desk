@@ -35,40 +35,48 @@ serve(async (req) => {
     // Get current month
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
 
-    // Get unique workflow names from executions for this user
+    // Get unique workflows from executions for this user (by workflow ID)
     const { data: uniqueWorkflows, error: workflowError } = await supabase
       .from('executions_log')
-      .select('workflow_name')
+      .select('n8n_workflow_id, workflow_name')
       .eq('user_id', user.id)
       .gte('execution_date', `${currentMonth}-01`)
-      .lt('execution_date', `${getNextMonth(currentMonth)}-01`);
+      .lt('execution_date', `${getNextMonth(currentMonth)}-01`)
+      .not('n8n_workflow_id', 'is', null);
 
     if (workflowError) {
-      console.error('Error fetching workflow names:', workflowError);
+      console.error('Error fetching workflow data:', workflowError);
       throw workflowError;
     }
 
-    // Get unique workflow names
-    const workflowNames = [...new Set(uniqueWorkflows?.map(w => w.workflow_name) || [])];
-    console.log(`Found ${workflowNames.length} unique workflows from executions`);
+    // Get unique workflows by ID (use the most recent workflow name for each ID)
+    const workflowMap = new Map();
+    uniqueWorkflows?.forEach(w => {
+      if (w.n8n_workflow_id) {
+        workflowMap.set(w.n8n_workflow_id, w.workflow_name);
+      }
+    });
+    
+    const workflows = Array.from(workflowMap.entries()).map(([id, name]) => ({ id, name }));
+    console.log(`Found ${workflows.length} unique workflows from executions`);
 
     // For each unique workflow, calculate performance metrics
     const workflowPerformance = await Promise.all(
-      workflowNames.map(async (workflowName) => {
+      workflows.map(async (workflow) => {
         // Get executions for this workflow this month
         const { data: executions, error: execError } = await supabase
           .from('executions_log')
           .select('*')
           .eq('user_id', user.id)
-          .eq('workflow_name', workflowName)
+          .eq('n8n_workflow_id', workflow.id)
           .gte('execution_date', `${currentMonth}-01`)
           .lt('execution_date', `${getNextMonth(currentMonth)}-01`);
 
         if (execError) {
           console.error('Error fetching executions:', execError);
           return {
-            id: `workflow-${workflowName.toLowerCase().replace(/\s+/g, '-')}`,
-            workflow_name: workflowName,
+            id: workflow.id,
+            workflow_name: workflow.name,
             total_executions: 0,
             success_rate: 0,
             time_saved: 0,
@@ -83,8 +91,8 @@ serve(async (req) => {
         const moneySaved = executions?.reduce((sum, e) => sum + (Number(e.money_saved) || 0), 0) || 0;
 
         return {
-          id: `workflow-${workflowName.toLowerCase().replace(/\s+/g, '-')}`,
-          workflow_name: workflowName,
+          id: workflow.id,
+          workflow_name: workflow.name,
           total_executions: totalExecutions,
           success_rate: Math.round(successRate * 10) / 10, // Round to 1 decimal
           time_saved: timeSaved,
