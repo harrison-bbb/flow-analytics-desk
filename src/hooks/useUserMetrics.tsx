@@ -53,7 +53,7 @@ export const useUserMetrics = () => {
           money_saved_total: Number(data.money_saved_total) || 0,
           executions_month: data.executions_month || 0,
           managed_workflows: data.managed_workflows || 0,
-          api_usage_percentage: Number(data.api_usage_percentage) || 0,
+          api_usage_percentage: 0, // This field doesn't exist in new schema
         });
       } else {
         // Create default metrics if none exist
@@ -113,7 +113,7 @@ export const useUserMetrics = () => {
               money_saved_total: Number(payload.new.money_saved_total) || 0,
               executions_month: payload.new.executions_month || 0,
               managed_workflows: payload.new.managed_workflows || 0,
-              api_usage_percentage: Number(payload.new.api_usage_percentage) || 0,
+              api_usage_percentage: 0, // This field doesn't exist in new schema
             });
           }
         }

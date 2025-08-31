@@ -90,15 +90,27 @@ serve(async (req) => {
     const totalMoneySaved = totalData?.reduce((sum, record) => sum + (parseFloat(record.money_saved || '0')), 0) || 0;
     const previousTotalMoney = totalMoneySaved - currentMonthMoney;
 
+    // Get user's current plan cost for ROI calculation
+    const { data: userSubscription } = await supabaseClient
+      .from('user_subscriptions')
+      .select(`
+        plan:subscription_plans(monthly_cost_aud)
+      `)
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .maybeSingle();
+    
+    const planCost = userSubscription?.plan?.monthly_cost_aud || 3500; // Default to Growth Engine
+
     // Only calculate meaningful trends if there's previous month data
     let trends = null;
     
     if (previousMonthExecutions > 0) {
-      // Calculate ROI changes based on monthly data, not total
-      const currentMonthROI = currentMonthExecutions > 0 ? 
-        ((currentMonthMoney - (currentMonthExecutions * 10)) / (currentMonthExecutions * 10)) * 100 : 0;
-      const previousMonthROI = previousMonthExecutions > 0 ? 
-        ((previousMonthMoney - (previousMonthExecutions * 10)) / (previousMonthExecutions * 10)) * 100 : 0;
+      // Calculate ROI changes using plan-based calculation
+      const currentMonthROI = planCost > 0 ? 
+        ((currentMonthMoney - planCost) / planCost) * 100 : 0;
+      const previousMonthROI = planCost > 0 ? 
+        ((previousMonthMoney - planCost) / planCost) * 100 : 0;
       
       trends = {
         money_saved_month_change: currentMonthMoney - previousMonthMoney,
