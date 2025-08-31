@@ -52,7 +52,7 @@ serve(async (req) => {
       .from('user_metrics')
       .select('*')
       .eq('user_id', user_id)
-      .single();
+      .maybeSingle();
 
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
     const lastUpdated = existingMetrics?.last_updated 
