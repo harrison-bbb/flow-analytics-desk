@@ -101,9 +101,41 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean
+          monthly_cost_aud: number
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          monthly_cost_aud: number
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          monthly_cost_aud?: number
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_metrics: {
         Row: {
-          api_usage_percentage: number | null
           created_at: string | null
           executions_month: number | null
           id: string
@@ -116,7 +148,6 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
-          api_usage_percentage?: number | null
           created_at?: string | null
           executions_month?: number | null
           id?: string
@@ -129,7 +160,6 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
-          api_usage_percentage?: number | null
           created_at?: string | null
           executions_month?: number | null
           id?: string
@@ -142,6 +172,47 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          is_active: boolean
+          plan_id: string
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          plan_id: string
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean
+          plan_id?: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workflows: {
         Row: {
@@ -189,6 +260,14 @@ export type Database = {
     Functions: {
       calculate_roi_safe: {
         Args: { executions: number; total_saved: number }
+        Returns: number
+      }
+      calculate_roi_with_plan: {
+        Args: { plan_cost: number; total_saved: number }
+        Returns: number
+      }
+      get_user_plan_cost: {
+        Args: { target_user_id: string }
         Returns: number
       }
       recalculate_user_metrics_simple: {
