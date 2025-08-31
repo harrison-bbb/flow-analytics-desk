@@ -65,6 +65,7 @@ serve(async (req) => {
         const dayStr = date.toLocaleDateString('en-US', { weekday: 'short' });
         const dateStr = date.toISOString().split('T')[0];
         
+        // Count executions for this specific date
         const count = executions?.filter(exec => {
           const execDate = new Date(exec.execution_date);
           const execDateStr = execDate.toISOString().split('T')[0];
