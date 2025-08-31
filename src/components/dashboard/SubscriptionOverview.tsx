@@ -61,7 +61,13 @@ export const SubscriptionOverview = () => {
     return roi;
   };
 
+  const calculateNetMonthlySavings = () => {
+    if (!metrics) return 0;
+    return metrics.money_saved_month - plan.monthly_cost_aud;
+  };
+
   const monthlyROI = calculateMonthlyROI();
+  const netMonthlySavings = calculateNetMonthlySavings();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -116,7 +122,7 @@ export const SubscriptionOverview = () => {
             <>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Monthly Savings</span>
+                  <span className="text-muted-foreground">Gross Monthly Savings</span>
                   <span className="font-medium">
                     {formatPrice(metrics.money_saved_month)}
                   </span>
@@ -124,7 +130,15 @@ export const SubscriptionOverview = () => {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Plan Cost</span>
                   <span className="font-medium">
-                    {formatPrice(plan.monthly_cost_aud)}
+                    -{formatPrice(plan.monthly_cost_aud)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm border-t pt-2">
+                  <span className="text-muted-foreground">Net Monthly Savings</span>
+                  <span className={`font-medium ${
+                    netMonthlySavings >= 0 ? 'text-success' : 'text-destructive'
+                  }`}>
+                    {formatPrice(netMonthlySavings)}
                   </span>
                 </div>
                 <div className="border-t pt-2">
