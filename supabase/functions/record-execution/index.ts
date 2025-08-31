@@ -256,7 +256,7 @@ serve(async (req) => {
 });
 
 function calculateROI(totalSaved: number, executions: number): number {
-  if (executions === 0 || totalSaved <= 0) {
+  if (executions <= 0 || totalSaved <= 0) {
     return 0;
   }
   
@@ -265,7 +265,7 @@ function calculateROI(totalSaved: number, executions: number): number {
   const costBasis = executions * 10;
   const roi = ((totalSaved - costBasis) / costBasis) * 100;
   
-  // Cap ROI between -100% and 9999% to prevent numeric overflow (database limit is 999999.99)
-  // Round to 2 decimal places
-  return Math.max(-100, Math.min(9999, Math.round(roi * 100) / 100));
+  // Cap ROI between -100% and 99999% to prevent numeric overflow (new database limit is 999999.99)
+  // Round to 2 decimal places for precision
+  return Math.max(-100, Math.min(99999, Math.round(roi * 100) / 100));
 }
