@@ -35,15 +35,27 @@ serve(async (req) => {
     if (type === 'executions') {
       // Get daily executions for the last 7 days
       const endDate = new Date();
+      endDate.setHours(23, 59, 59, 999); // End of today
+      
       const startDate = new Date();
       startDate.setDate(endDate.getDate() - 6);
+      startDate.setHours(0, 0, 0, 0); // Start of 7 days ago
 
-      const { data: executions } = await supabaseClient
+      console.log(`Fetching executions from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+
+      const { data: executions, error: execError } = await supabaseClient
         .from('executions_log')
         .select('execution_date')
         .eq('user_id', user.id)
         .gte('execution_date', startDate.toISOString())
         .lte('execution_date', endDate.toISOString());
+
+      if (execError) {
+        console.error('Error fetching executions:', execError);
+        throw execError;
+      }
+
+      console.log(`Found ${executions?.length || 0} executions`);
 
       // Group by day
       const dailyData = [];
@@ -54,10 +66,11 @@ serve(async (req) => {
         const dateStr = date.toISOString().split('T')[0];
         
         const count = executions?.filter(exec => {
-          const execDate = new Date(exec.execution_date);
-          const execDateStr = execDate.toISOString().split('T')[0];
+          const execDateStr = exec.execution_date.split('T')[0];
           return execDateStr === dateStr;
         }).length || 0;
+
+        console.log(`${dayStr} (${dateStr}): ${count} executions`);
 
         dailyData.push({
           day: dayStr,
@@ -71,46 +84,67 @@ serve(async (req) => {
       );
     } else if (type === 'savings') {
       // Get monthly savings data for the last 6 months
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setMonth(endDate.getMonth() - 5);
+      startDate.setDate(1); // First day of 6 months ago
+
+      console.log(`Fetching savings from ${startDate.toISOString()} to ${endDate.toISOString()}`);
+
       const { data: savingsData, error: savingsError } = await supabaseClient
         .from('executions_log')
         .select('execution_date, money_saved')
         .eq('user_id', user.id)
-        .gte('execution_date', new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000).toISOString())
+        .gte('execution_date', startDate.toISOString())
+        .lte('execution_date', endDate.toISOString())
         .order('execution_date', { ascending: true });
 
       if (savingsError) {
+        console.error('Error fetching savings:', savingsError);
         throw savingsError;
       }
+
+      console.log(`Found ${savingsData?.length || 0} savings records`);
 
       // Group by month and calculate totals
       const monthlyData: { [key: string]: { savings: number; executions: number } } = {};
       
+      // Initialize all 6 months with zero data
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthlyData[monthKey] = { savings: 0, executions: 0 };
+      }
+      
       savingsData?.forEach(log => {
         const date = new Date(log.execution_date);
-        const month = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
-        if (!monthlyData[month]) {
-          monthlyData[month] = { savings: 0, executions: 0 };
+        if (monthlyData[monthKey]) {
+          monthlyData[monthKey].savings += parseFloat(log.money_saved || 0);
+          monthlyData[monthKey].executions += 1;
         }
-        
-        monthlyData[month].savings += parseFloat(log.money_saved || 0);
-        monthlyData[month].executions += 1;
       });
 
       // Convert to array format expected by the chart with proper month names
-      const chartData = Object.entries(monthlyData).map(([month, data]) => {
-        const [year, monthNum] = month.split('-');
-        const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'short' 
+      const chartData = Object.entries(monthlyData)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([monthKey, data]) => {
+          const [year, monthNum] = monthKey.split('-');
+          const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleDateString('en-US', { 
+            month: 'short',
+            year: 'numeric'
+          });
+          
+          console.log(`${monthName}: $${data.savings} from ${data.executions} executions`);
+          
+          return {
+            month: monthName,
+            savings: Math.round(data.savings),
+            executions: data.executions
+          };
         });
-        
-        return {
-          month: monthName,
-          savings: Math.round(data.savings),
-          executions: data.executions
-        };
-      });
 
       return new Response(
         JSON.stringify({ data: chartData }),
