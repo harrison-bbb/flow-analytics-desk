@@ -1,13 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { useChartData, SavingsChartData } from "@/hooks/useChartData";
-
 export const RevenueChart = () => {
-  const { data, loading } = useChartData('savings');
-
+  const {
+    data,
+    loading
+  } = useChartData('savings');
   if (loading) {
-    return (
-      <Card className="col-span-full lg:col-span-2">
+    return <Card className="col-span-full lg:col-span-2">
         <CardHeader>
           <CardTitle>Money Saved Over Time</CardTitle>
           <CardDescription>Monthly savings from automated workflows</CardDescription>
@@ -15,39 +15,25 @@ export const RevenueChart = () => {
         <CardContent>
           <div className="h-[350px] flex items-center justify-center">Loading...</div>
         </CardContent>
-      </Card>
-    );
+      </Card>;
   }
-  return (
-    <Card className="col-span-full lg:col-span-2">
+  return <Card className="col-span-full lg:col-span-2">
       <CardHeader>
         <CardTitle>Money Saved Over Time</CardTitle>
-        <CardDescription>
-          Monthly savings from automated workflows
-        </CardDescription>
+        <CardDescription>Monthly savings from automations</CardDescription>
       </CardHeader>
       <CardContent className="pl-2">
         <ResponsiveContainer width="100%" height={350}>
           <AreaChart data={data as SavingsChartData[]}>
-            <XAxis 
-              dataKey="month" 
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `$${value}`}
-            />
-            <Tooltip 
-              content={({ active, payload, label }) => {
-                if (active && payload && payload.length) {
-                  return (
-                    <div className="rounded-lg border bg-background p-2 shadow-sm">
+            <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={value => `$${value}`} />
+            <Tooltip content={({
+            active,
+            payload,
+            label
+          }) => {
+            if (active && payload && payload.length) {
+              return <div className="rounded-lg border bg-background p-2 shadow-sm">
                       <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col">
                           <span className="text-[0.70rem] uppercase text-muted-foreground">
@@ -58,23 +44,13 @@ export const RevenueChart = () => {
                           </span>
                         </div>
                       </div>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Area
-              type="monotone"
-              dataKey="savings"
-              stroke="hsl(var(--success))"
-              fill="hsl(var(--success))"
-              fillOpacity={0.1}
-              strokeWidth={2}
-            />
+                    </div>;
+            }
+            return null;
+          }} />
+            <Area type="monotone" dataKey="savings" stroke="hsl(var(--success))" fill="hsl(var(--success))" fillOpacity={0.1} strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
