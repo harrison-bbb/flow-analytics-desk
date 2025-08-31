@@ -76,19 +76,25 @@ export const useUserMetrics = () => {
       } else if (trendsData?.trends) {
         setTrends(trendsData.trends);
         
-        // Update metrics with the correct monthly money saved from trends calculation
-        if (data && trendsData.trends) {
-          const currentMonthMoney = trendsData.currentMonthMoney || 0;
-          const currentMonthTime = trendsData.currentMonthTime || 0;
-          const currentMonthExecutions = trendsData.currentMonthExecutions || 0;
-          
-          setMetrics(prev => prev ? {
-            ...prev,
-            money_saved_month: currentMonthMoney,
-            time_saved_month: currentMonthTime,
-            executions_month: currentMonthExecutions,
-          } : null);
-        }
+        // Update metrics with the correct monthly totals from trends calculation
+        const currentMonthMoney = trendsData.currentMonthMoney || 0;
+        const currentMonthTime = trendsData.currentMonthTime || 0;
+        const currentMonthExecutions = trendsData.currentMonthExecutions || 0;
+        
+        setMetrics(prev => prev ? {
+          ...prev,
+          money_saved_month: currentMonthMoney,
+          time_saved_month: currentMonthTime,
+          executions_month: currentMonthExecutions,
+        } : {
+          roi_percentage: Number(data?.roi_percentage) || 0,
+          time_saved_month: currentMonthTime,
+          money_saved_month: currentMonthMoney,
+          money_saved_total: Number(data?.money_saved_total) || 0,
+          executions_month: currentMonthExecutions,
+          managed_workflows: data?.managed_workflows || 0,
+          api_usage_percentage: 0,
+        });
       }
 
     } catch (err) {
