@@ -127,10 +127,10 @@ serve(async (req) => {
       };
     }
 
-    console.log('Calculated trends:', {
+    console.log('Final calculated values:', {
       currentMonthMoney,
-      previousMonthMoney,
-      previousMonthExecutions,
+      currentMonthTime,
+      currentMonthExecutions,
       trends
     });
 
