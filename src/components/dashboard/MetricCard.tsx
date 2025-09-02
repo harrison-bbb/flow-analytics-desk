@@ -10,7 +10,6 @@ interface MetricCardProps {
     value: number;
     label: string;
     isAbsolute?: boolean;
-    isMonetary?: boolean;
   };
   variant?: "default" | "success" | "warning";
   className?: string;
@@ -52,13 +51,15 @@ export const MetricCard = ({
               "font-medium",
               trend.value > 0 ? "text-success" : trend.value < 0 ? "text-destructive" : "text-muted-foreground"
             )}>
-              {trend.value < 0 ? (
-                `${Math.abs(trend.value)}${trend.isAbsolute ? (trend.isMonetary !== false ? (Math.abs(trend.value) >= 1000 ? `${(Math.abs(trend.value) / 1000).toFixed(1)}k` : Math.round(Math.abs(trend.value)).toLocaleString()) : Math.round(Math.abs(trend.value)).toLocaleString()) : '%'}`
-              ) : (
-                `${trend.value > 0 ? "+" : ""}${trend.isAbsolute ? (trend.isMonetary !== false ? (trend.value >= 1000 ? `$${(trend.value / 1000).toFixed(1)}k` : `$${Math.round(trend.value).toLocaleString()}`) : Math.round(trend.value).toLocaleString()) : `${trend.value}%`}`
-              )}
+              {trend.value > 0 ? "+" : ""}{trend.isAbsolute ? 
+                (trend.value >= 1000 ? 
+                  `$${(trend.value / 1000).toFixed(1)}k` : 
+                  `$${Math.round(trend.value).toLocaleString()}`
+                ) : 
+                `${trend.value}%`
+              }
             </span>{" "}
-            {trend.value < 0 ? "less than last month" : trend.label}
+            {trend.label}
           </p>
         )}
       </CardContent>

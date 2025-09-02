@@ -67,8 +67,7 @@ const Index = () => {
             trend={trends?.time_saved_month_change !== undefined ? {
               value: trends.time_saved_month_change,
               label: "since last month",
-              isAbsolute: true,
-              isMonetary: false
+              isAbsolute: true
             } : undefined}
           />
           <MetricCard
@@ -104,8 +103,7 @@ const Index = () => {
             trend={trends?.executions_change !== undefined ? {
               value: trends.executions_change,
               label: "since last month",
-              isAbsolute: true,
-              isMonetary: false
+              isAbsolute: true
             } : undefined}
           />
           <MetricCard
