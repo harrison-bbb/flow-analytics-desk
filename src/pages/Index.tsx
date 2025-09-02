@@ -10,6 +10,7 @@ import { ExecutionStatusChart } from "@/components/dashboard/ExecutionStatusChar
 import { ClientContactCard } from "@/components/dashboard/ClientContactCard";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserMetrics } from "@/hooks/useUserMetrics";
+import { useSubscriptionPlans } from "@/hooks/useSubscriptionPlans";
 import { 
   TrendingUp, 
   Clock, 
@@ -22,6 +23,7 @@ import {
 const Index = () => {
   const { user, loading } = useAuth();
   const { metrics, trends, loading: metricsLoading } = useUserMetrics();
+  const { userSubscription } = useSubscriptionPlans();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +44,21 @@ const Index = () => {
     return null; // Will redirect to auth page
   }
 
+  // Calculate monthly ROI dynamically
+  const calculateMonthlyROI = () => {
+    if (!metrics || !userSubscription?.plan) return 0;
+    
+    const monthlySavings = metrics.money_saved_month;
+    const planCost = userSubscription.plan.monthly_cost_aud;
+    
+    if (planCost <= 0) return 0;
+    
+    const roi = ((monthlySavings - planCost) / planCost) * 100;
+    return roi;
+  };
+
+  const monthlyROI = calculateMonthlyROI();
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Premium background effects */}
@@ -56,9 +73,9 @@ const Index = () => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
             title="ROI"
-            value={`${Math.round(metrics?.roi_percentage || 0)}%`}
+            value={`${Math.round(monthlyROI)}%`}
             icon={TrendingUp}
-            variant={metrics?.roi_percentage && metrics.roi_percentage > 0 ? "success" : "default"}
+            variant={monthlyROI > 0 ? "success" : "default"}
             trend={trends?.roi_change !== undefined ? {
               value: Math.round(trends.roi_change * 100) / 100,
               label: "since last month"
