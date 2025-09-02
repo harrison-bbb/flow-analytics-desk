@@ -22,7 +22,7 @@ export const DashboardHeader = () => {
         <Button 
           variant="outline" 
           onClick={signOut}
-          className="flex items-center gap-2 border-border/50 hover:border-border bg-card text-foreground hover:bg-muted/50"
+          className="flex items-center gap-2 border-border/50 hover:border-border bg-card text-foreground hover:bg-muted/50 hover:text-foreground"
         >
           <LogOut className="h-4 w-4" />
           Sign Out
