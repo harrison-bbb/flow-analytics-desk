@@ -82,7 +82,7 @@ const Index = () => {
             } : undefined}
           />
           <MetricCard
-            title="Time Saved This Month"
+            title="Estimated Time Saved This Month"
             value={`${metrics?.time_saved_month || 0}h`}
             icon={Clock}
             variant="success"
@@ -94,7 +94,7 @@ const Index = () => {
             } : undefined}
           />
           <MetricCard
-            title="Money Saved This Month"
+            title="Estimated Money Saved This Month"
             value={`$${(metrics?.money_saved_month || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
@@ -105,7 +105,7 @@ const Index = () => {
             } : undefined}
           />
           <MetricCard
-            title="Money Saved All Time"
+            title="Estimated Money Saved All Time"
             value={`$${(metrics?.money_saved_total || 0).toLocaleString()}`}
             icon={DollarSign}
             variant="success"
