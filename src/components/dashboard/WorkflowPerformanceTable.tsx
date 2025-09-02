@@ -29,7 +29,7 @@ export const WorkflowPerformanceTable = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            Workflow Performance
+            Workflow Performance This Month
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -49,7 +49,7 @@ export const WorkflowPerformanceTable = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            Workflow Performance
+            Workflow Performance This Month
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -70,7 +70,7 @@ export const WorkflowPerformanceTable = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Target className="h-5 w-5" />
-          Workflow Performance
+          Workflow Performance This Month
         </CardTitle>
       </CardHeader>
       <CardContent>
