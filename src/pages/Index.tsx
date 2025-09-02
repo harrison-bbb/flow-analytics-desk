@@ -72,7 +72,7 @@ const Index = () => {
         {/* Key Metrics Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <MetricCard
-            title="ROI"
+            title="ROI This Month"
             value={`${Math.round(monthlyROI)}%`}
             icon={TrendingUp}
             variant={monthlyROI > 0 ? "success" : "default"}
