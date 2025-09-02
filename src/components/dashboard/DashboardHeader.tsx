@@ -9,11 +9,18 @@ export const DashboardHeader = () => {
     <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
       <div className="space-y-2">
         <div className="flex items-center gap-4">
-          <img 
-            src="/lovable-uploads/1c3eaeb6-791e-4b7a-8d00-aeec1efccd4d.png" 
-            alt="Company Logo" 
-            className="h-12 w-12 object-contain"
-          />
+          <a 
+            href="https://blackboxbots.com/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="transition-opacity hover:opacity-80"
+          >
+            <img 
+              src="/lovable-uploads/09c0ac8f-48ac-4e21-ae15-2a5f58db9e6e.png" 
+              alt="BlackBox Bots Logo" 
+              className="h-12 w-12 object-contain"
+            />
+          </a>
           <h1 className="text-4xl font-bold tracking-tight gradient-text">
             Dashboard
           </h1>
