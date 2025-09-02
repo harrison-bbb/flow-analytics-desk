@@ -43,8 +43,13 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 space-y-8">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Premium background effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-black"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
+      
+      <div className="relative z-10 container mx-auto px-4 py-8 space-y-8">
         <DashboardHeader />
         
         {/* Key Metrics Grid */}
@@ -128,9 +133,9 @@ const Index = () => {
           <div className="space-y-6">
             <ActivityFeed />
             <ClientContactCard />
-          </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

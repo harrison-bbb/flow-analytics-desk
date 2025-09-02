@@ -37,7 +37,11 @@ export const MetricCard = ({
   };
 
   return (
-    <Card className={cn("relative overflow-hidden", variants[variant], className)}>
+    <Card className={cn(
+      "premium-card relative overflow-hidden transition-all duration-300 hover:scale-105", 
+      variants[variant], 
+      className
+    )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground">
           {title}
@@ -45,7 +49,7 @@ export const MetricCard = ({
         <Icon className={cn("h-4 w-4", iconVariants[variant])} />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-foreground">{value}</div>
+        <div className="text-2xl font-bold gradient-text">{value}</div>
         {trend && (
           <p className="text-xs text-muted-foreground mt-1">
             <span className={cn(
