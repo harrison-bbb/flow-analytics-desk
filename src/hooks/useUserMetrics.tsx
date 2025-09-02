@@ -47,7 +47,7 @@ export const useUserMetrics = () => {
 
       if (data) {
         setMetrics({
-          roi_percentage: Number(data.roi_percentage) || 0,
+          roi_percentage: 0, // Will be calculated from monthly data
           time_saved_month: data.time_saved_month || 0,
           money_saved_month: Number(data.money_saved_month) || 0,
           money_saved_total: Number(data.money_saved_total) || 0,
@@ -86,8 +86,9 @@ export const useUserMetrics = () => {
           money_saved_month: currentMonthMoney,
           time_saved_month: currentMonthTime,
           executions_month: currentMonthExecutions,
+          roi_percentage: 0, // Will be calculated by components using monthly data
         } : {
-          roi_percentage: Number(data?.roi_percentage) || 0,
+          roi_percentage: 0, // Will be calculated by components using monthly data
           time_saved_month: currentMonthTime,
           money_saved_month: currentMonthMoney,
           money_saved_total: Number(data?.money_saved_total) || 0,
@@ -141,7 +142,7 @@ export const useUserMetrics = () => {
             // Only update certain fields from real-time, keep live-calculated fields
             setMetrics(prev => prev ? {
               ...prev,
-              roi_percentage: Number(payload.new.roi_percentage) || 0,
+              roi_percentage: 0, // Will be calculated by components using monthly data
               money_saved_total: Number(payload.new.money_saved_total) || 0,
               managed_workflows: payload.new.managed_workflows || 0,
               // Don't update monthly fields - they come from live trends calculation
