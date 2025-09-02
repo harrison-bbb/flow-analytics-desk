@@ -100,22 +100,13 @@ export const ExecutionStatusChart = () => {
               <PieChart>
                 <defs>
                   <linearGradient id="successGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={1} />
-                    <stop offset="50%" stopColor="hsl(var(--success))" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
+                    <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.6} />
+                    <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0.4} />
                   </linearGradient>
                   <linearGradient id="failureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="hsl(var(--destructive))" stopOpacity={1} />
-                    <stop offset="50%" stopColor="hsl(var(--destructive))" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="hsl(var(--muted))" stopOpacity={0.6} />
+                    <stop offset="0%" stopColor="hsl(var(--destructive))" stopOpacity={0.6} />
+                    <stop offset="100%" stopColor="hsl(var(--destructive))" stopOpacity={0.4} />
                   </linearGradient>
-                  <filter id="glow">
-                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                    <feMerge> 
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
                 </defs>
                 <Pie
                   data={[
@@ -136,13 +127,15 @@ export const ExecutionStatusChart = () => {
                   outerRadius={120}
                   paddingAngle={5}
                   dataKey="value"
-                  className="drop-shadow-lg"
-                  filter="url(#glow)"
+                  stroke="none"
+                  strokeWidth={0}
                 >
                   {pieData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
                       fill={index === 0 ? 'url(#successGradient)' : 'url(#failureGradient)'}
+                      stroke="none"
+                      strokeWidth={0}
                       className="hover:opacity-80 transition-opacity duration-200"
                     />
                   ))}
