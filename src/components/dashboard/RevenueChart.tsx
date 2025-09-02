@@ -25,6 +25,13 @@ export const RevenueChart = () => {
       <CardContent className="pl-2">
         <ResponsiveContainer width="100%" height={350}>
           <AreaChart data={data as SavingsChartData[]}>
+            <defs>
+              <linearGradient id="savingsGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                <stop offset="50%" stopColor="hsl(var(--success))" stopOpacity={0.1} />
+                <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
             <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={value => `$${value}`} />
             <Tooltip content={({
@@ -48,7 +55,13 @@ export const RevenueChart = () => {
             }
             return null;
           }} />
-            <Area type="monotone" dataKey="savings" stroke="hsl(var(--success))" fill="hsl(var(--success))" fillOpacity={0.1} strokeWidth={2} />
+            <Area 
+              type="monotone" 
+              dataKey="savings" 
+              stroke="hsl(var(--success))" 
+              fill="url(#savingsGradient)" 
+              strokeWidth={2} 
+            />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>
