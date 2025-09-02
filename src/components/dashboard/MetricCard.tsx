@@ -51,15 +51,27 @@ export const MetricCard = ({
               "font-medium",
               trend.value > 0 ? "text-success" : trend.value < 0 ? "text-destructive" : "text-muted-foreground"
             )}>
-              {trend.value > 0 ? "+" : ""}{trend.isAbsolute ? 
-                (trend.value >= 1000 ? 
-                  `$${(trend.value / 1000).toFixed(1)}k` : 
-                  `$${Math.round(trend.value).toLocaleString()}`
-                ) : 
-                `${trend.value}%`
-              }
-            </span>{" "}
-            {trend.label}
+              {trend.value > 0 ? "+" : ""}
+              {trend.value < 0 ? (
+                `${trend.isAbsolute ? 
+                  (Math.abs(trend.value) >= 1000 ? 
+                    `$${(Math.abs(trend.value) / 1000).toFixed(1)}k` : 
+                    `$${Math.abs(trend.value).toLocaleString()}`
+                  ) : 
+                  `${Math.abs(trend.value)}%`
+                } Less than last month`
+              ) : (
+                trend.isAbsolute ? 
+                  (trend.value >= 1000 ? 
+                    `$${(trend.value / 1000).toFixed(1)}k` : 
+                    `$${Math.round(trend.value).toLocaleString()}`
+                  ) : 
+                  `${trend.value}%`
+              )}
+            </span>
+            {trend.value >= 0 && (
+              <span> {trend.label}</span>
+            )}
           </p>
         )}
       </CardContent>
