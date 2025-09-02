@@ -88,6 +88,7 @@ serve(async (req) => {
       n8n_workflow_id, 
       time_saved = 0, 
       money_saved = 0, 
+      execution_status = 'Success',
       automation_type = 'automation',
       metadata = {}
     } = body;
@@ -99,6 +100,7 @@ serve(async (req) => {
     console.log('Recording execution:', { 
       user_id, 
       workflow_name, 
+      execution_status,
       time_saved: timeSavedNum, 
       money_saved: moneySavedNum 
     });
@@ -112,6 +114,7 @@ serve(async (req) => {
         n8n_workflow_id,
         time_saved: timeSavedNum,
         money_saved: moneySavedNum,
+        execution_status: execution_status || 'Success', // Ensure it's never null
         automation_type,
         metadata
       });
