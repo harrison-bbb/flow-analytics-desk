@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Ultra-dark theme inspired by your website */
+    /* Ultra-dark theme with subtle white accents */
     --background: 0 0% 3%;
     --foreground: 0 0% 96%;
 
@@ -18,8 +18,8 @@ All colors MUST be HSL.
     --popover: 0 0% 6%;
     --popover-foreground: 0 0% 96%;
 
-    --primary: 240 100% 70%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 90%;
+    --primary-foreground: 0 0% 10%;
 
     --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 96%;
@@ -27,8 +27,8 @@ All colors MUST be HSL.
     --muted: 0 0% 8%;
     --muted-foreground: 0 0% 60%;
 
-    --accent: 240 100% 70%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 85%;
+    --accent-foreground: 0 0% 10%;
 
     --success: 120 60% 50%;
     --success-foreground: 0 0% 100%;
@@ -41,28 +41,28 @@ All colors MUST be HSL.
 
     --border: 0 0% 12%;
     --input: 0 0% 8%;
-    --ring: 240 100% 70%;
+    --ring: 0 0% 85%;
 
     --radius: 12px;
 
-    /* Premium gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(240 100% 70%), hsl(260 100% 75%));
+    /* Subtle white gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 85%), hsl(0 0% 95%));
     --gradient-secondary: linear-gradient(135deg, hsl(0 0% 6%), hsl(0 0% 10%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 3%), hsl(0 0% 1%));
     
-    /* Elegant shadows */
+    /* Elegant shadows with white glow */
     --shadow-premium: 0 25px 50px -12px hsl(0 0% 0% / 0.8);
     --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.6);
-    --shadow-glow: 0 0 40px hsl(240 100% 70% / 0.3);
+    --shadow-glow: 0 0 40px hsl(0 0% 85% / 0.1);
 
     --sidebar-background: 0 0% 5%;
     --sidebar-foreground: 0 0% 96%;
-    --sidebar-primary: 240 100% 70%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 90%;
+    --sidebar-primary-foreground: 0 0% 10%;
     --sidebar-accent: 0 0% 8%;
     --sidebar-accent-foreground: 0 0% 96%;
     --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 240 100% 70%;
+    --sidebar-ring: 0 0% 85%;
   }
 
   .dark {
@@ -144,7 +144,7 @@ All colors MUST be HSL.
   }
   
   .btn-premium:hover {
-    box-shadow: 0 0 60px hsl(240 100% 70% / 0.4);
+    box-shadow: 0 0 60px hsl(0 0% 85% / 0.2);
     transform: translateY(-1px);
   }
 }
