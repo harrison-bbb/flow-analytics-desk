@@ -58,7 +58,6 @@ serve(async (req) => {
 
     // Get previous month metrics from executions_log (using same logic as chart)
     const previousMonthStart = new Date(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1);
-    const currentMonthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     
     const { data: previousMonthData, error: previousError } = await supabaseClient
       .from('executions_log')
