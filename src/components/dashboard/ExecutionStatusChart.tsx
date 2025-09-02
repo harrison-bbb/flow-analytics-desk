@@ -77,10 +77,10 @@ export const ExecutionStatusChart = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5" />
+    <Card className="bg-gradient-to-br from-card via-card to-card/50 border-border/50 backdrop-blur-sm">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-foreground">
+          <Target className="h-5 w-5 text-primary" />
           Success/Failure Rate
         </CardTitle>
       </CardHeader>
@@ -92,29 +92,84 @@ export const ExecutionStatusChart = () => {
             </p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={120}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend 
-                formatter={(value, entry) => (
-                  <span style={{ color: entry.color }}>{value}</span>
-                )}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="relative">
+            {/* Background gradient effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5 rounded-lg pointer-events-none" />
+            
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <defs>
+                  <linearGradient id="successGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={1} />
+                    <stop offset="50%" stopColor="hsl(var(--success))" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.6} />
+                  </linearGradient>
+                  <linearGradient id="failureGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="hsl(var(--destructive))" stopOpacity={1} />
+                    <stop offset="50%" stopColor="hsl(var(--destructive))" stopOpacity={0.8} />
+                    <stop offset="100%" stopColor="hsl(var(--muted))" stopOpacity={0.6} />
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge> 
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
+                <Pie
+                  data={[
+                    {
+                      name: 'Successful',
+                      value: successCount,
+                      color: 'url(#successGradient)',
+                    },
+                    {
+                      name: 'Failed',
+                      value: failureCount,
+                      color: 'url(#failureGradient)',
+                    },
+                  ]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={120}
+                  paddingAngle={5}
+                  dataKey="value"
+                  className="drop-shadow-lg"
+                  filter="url(#glow)"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={index === 0 ? 'url(#successGradient)' : 'url(#failureGradient)'}
+                      className="hover:opacity-80 transition-opacity duration-200"
+                    />
+                  ))}
+                </Pie>
+                <Tooltip 
+                  content={<CustomTooltip />}
+                  contentStyle={{
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 30px -10px hsl(var(--primary) / 0.3)',
+                    backdropFilter: 'blur(8px)',
+                  }}
+                />
+                <Legend 
+                  formatter={(value, entry) => (
+                    <span 
+                      style={{ color: value === 'Successful' ? 'hsl(var(--success))' : 'hsl(var(--destructive))' }}
+                      className="font-medium"
+                    >
+                      {value}
+                    </span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         )}
       </CardContent>
     </Card>
